@@ -1,65 +1,63 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
-const port:number=1300;
+const port:number=1212;
 
 interface iMessage{
          message:string;
-         sucess:boolean;
-         data:null| {}| {}[]
+         data:null| {}| {}[];
+         success:boolean;
 }
-interface iDetail{
+interface iData{
          name:string;
-         prepost:string
-         experience:string
+         age:number;
+         color:string;
 }
-const detail:iDetail[]=[
+const Data:iData[]=[
          {
-                  name:'Exper',
-                  prepost:'gateman',
-                  experience:'5years'
+                  name:'helen',
+                  age:20,
+                  color:'black',
          },
          {
-                  name:'Exper',
-                  prepost:'gateman',
-                  experience:'5years'
+                  name:'helarry',
+                  age:23,
+                  color:'purple',
          }
 ]
-const Server=http.createServer((req:IncomingMessage,res:ServerResponse<IncomingMessage>)=>{
-         res.setHeader('Content-Type', 'application/json')
-         const {method,url}=req
-         let Status:number=404;
-         let Response:iMessage={
-                  message:'Failed',
-                  sucess:false,
-                  data:null,
-         }
-         const Contain:any=[]
-         req.on('data',(chunk:any)=>{
-                  Contain.push(chunk)
-         }).on('end',()=>{
-                
-                  if (url==='/' && method==='GET') {
-                           Status=200;
-                           Response.message='Gotten';
-                           Response.sucess=true;
-                           Response.data=detail;
+const Server=http.createServer((req:IncomingMessage,
+         res:ServerResponse<IncomingMessage>)=>{
 
-                           res.write(JSON.stringify({Status,Response}))
-                           res.end()
+                  const {url,method}=req
+                 let Status:number=404;
+                  const Response:iMessage={
+                           message:'Failed',
+                           success:false,
+                           data:null,
                   }
-                
-                  if (url==='/' && method==='POST') {
-                           Status=201;
-                           const body=JSON.parse(Contain)
-                           detail.push(body);
-                           Response.message='created successfully';
-                           Response.sucess=true;
-                           Response.data=detail;
-                           res.write(JSON.stringify({Status,Response}))
-                           res.end()
-                  }
+                  const Container:any=[]
+                  req.on('data',(chunk:any)=>{
+                  Container.push(chunk)
+                  }).on('end',()=>{
 
-         })
-}) 
+                           if (url==='/' && method==='GET') {
+                                    Status=200;
+                                    Response.message='Succes'
+                                    Response.success=true;
+                                    Response.data=Data
+                                    res.write(JSON.stringify({Status,Response}))
+                                    res.end()
+                           }
+                           if (url==='/' && method==='POST') {
+                                    Status=201;
+                                    const body=JSON.parse(Container)
+                                    Data.push(body)
+                                    Response.message='created'
+                                    Response.success=true;
+                                    Response.data=Data
+                                    res.write(JSON.stringify({Status,Response}))
+                                    res.end()
+                           }
+                  })
+})
 Server.listen(port,()=>{
-         console.log('Server listening on port',port)
+         console.log('Listening on port',port)
 })
