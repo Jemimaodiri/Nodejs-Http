@@ -1,5 +1,5 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
-const port:number=1322;
+const port:number=1300;
 
 interface iMessage{
          message:string;
