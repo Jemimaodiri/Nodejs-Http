@@ -1,59 +1,61 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
-const Port:number=2500;
-interface iMsg{
+
+const Port:number=6000;
+
+interface iMessage{
          message:string;
-         data:null| []| {}[]
-         success:boolean
+         data:null|[]| {}[]
+         success:boolean;
 }
 interface iData{
-         name:string
-         class:string
-         teacher:string
+         name:string;
+         age:number;
 }
-const Students:iData[]=[
+const Person:iData[]=[
          {
-                  name:'Adeola',
-                  class:'Jss2 ',
-                  teacher:'Mr Bubemi'
+                  name:'John',
+                  age:55
          }
 ]
-const MyServer=http.createServer((req:IncomingMessage,res:ServerResponse<IncomingMessage>)=>{
-         res.setHeader('Content-Type','Application/json');
- const {method,url}=req;
+const Server=http.createServer((req:IncomingMessage,res:ServerResponse<IncomingMessage>)=>{
+         res.setHeader('Content-Type', 'application/json');
 
- let status:number=404;
+         const {method,url}=req;
+         let Status:number=404;
+         let Respond:iMessage={
+                  message:'Failed',
+                  data:null,
+                  success:false
+         }
+         const Container:any=[]
+         req.on('data',(chunk:any)=>{
+                  Container.push(chunk)
+         }).on('end',()=>{
 
- let Response:iMsg={
-         message:'Failed Operation',
-         data:null,
-         success:false
- }
- const Container:any=[]
- req.on('data',(chunk:any)=>{
-         Container.push(chunk);
- }).on('end',()=>{
-         if (url==='/' && method=== 'GET') {
-status=200;
-        Response.message='Success Getting a student data'
-        Response.success=true;
-        Response.data=Students;
-        res.write(JSON.stringify({Response,status}))
-        res.end()
+
+         if (url==='/' && method==='GET') {
+                  Status=200;
+                  Respond.message='Success getting data'
+                  Respond.success=true;
+                  Respond.data=Person;
+                 res.write(JSON.stringify({Status,Respond}))
+                  res.end();
+
+
          }
-         if (url==='/' && method=== 'POST') {
-status=201;
-const body=JSON.parse(Container)
-Students.push(body)
-        Response.message='Success adding a student data'
-        Response.success=true;
-        Response.data=Students;
-        res.write(JSON.stringify({Response,status}))
-        res.end()
+         if (url==='/' && method==='POST') {
+                  Status=201;
+                  const body=JSON.parse(Container)
+                  Person.push(body)
+                  Respond.message='Success in creating';
+                  Respond.success=true;
+                  Respond.data=Person;
+                  res.write(JSON.stringify({Respond,Status}))
+                  res.end()
          }
- })
+         })
 
 })
-MyServer.listen(Port,()=>{
-         console.clear()
-         console.log('listening on port number',Port)
+Server.listen(Port,()=>{
+         console.log('listening on port',Port)
 })
