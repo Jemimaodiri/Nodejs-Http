@@ -1,64 +1,62 @@
-import http, { IncomingMessage, ServerResponse, request } from 'http';
-const Port:number=2100;
+import http, { IncomingMessage, ServerResponse } from 'http';
+const Port:number=3700;
 interface iMessage{
          message:string;
-         data:null|{}|{}[]
+         data:null|any| {}|{}[]
          success:boolean
 }
 interface iData{
-         id:number
          name:string
-         category:string
-         age:number
+         school:string
+         gender:string
 }
-let Student:iData[]=[
+let Id:iData[]=[
          {
-                  id:1,
-                  name:'Ayomide',
-                  category:'Back-end',
-                  age:19
+                  name:'Amen',
+                  school:'AmenIntlsch',
+                  gender:'male'
          },
          {
-                  id:2,
-                  name:'Prince',
-                  category:'Front-end',
-                  age:21
-         },
+                  name:'Glory',
+                  school:'GloryIntlsch',
+                  gender:'female'
+         }
 ]
 const Server=http.createServer((req:IncomingMessage,res:ServerResponse<IncomingMessage>)=>{
-res.setHeader('Content-Type', 'application/json');
-const {method,url}=req
-let Status:number=404;
-let Response:iMessage={
-message:'Invalid',
-data:null,
-success:false
-}
-const contain:any=[]
-req.on('data',(chunk:any)=>{
-         contain.push(chunk)
-}).on('end',()=>{
-         if (url==='/' && method==='GET') {
-                  Status=200;
-                  Response.message='Success data of codelab student';
-                  Response.data=Student
-                  res.write(JSON.stringify({Status,Response}))
-                  res.end()
-         }
+         res.setHeader('Content-Type', 'application/json');
+         const {method,url}=req
+         const Contain:any=[]
+         res.on('data',(chunk:any)=>{
+                  Contain.push(chunk)
+         }).on('end',()=>{
+                  let Status:number=404;
+                  let Return:iMessage={
+                           message:'Failed',
+                           success:true,
+                           data:Id
+                  }
+                
+                  if (url==='/' && method==='GET') {
+                           Status=200;
+                           Return.message='Success',
+                           Return.success=true,
+                           Return.data=Id
+                           res.write(JSON.stringify({Status,Return}));
+                           res.end();
+                  }
+                  if (url==='/' && method==='POST') {
+                           Status=201;
+                           const body=JSON.parse(Contain)
+                           Id.push(body)
+                           Return.message='Created',
+                           Return.success=true,
+                           Return.data=Id
+                           res.write(JSON.stringify({Status,Return}));
+                           res.end();
+                  }
+         })
 
-         if (url==='/' && method==='POST') {
-                  Status=201;
-                  const body=JSON.parse(contain)
-                  Student.push(body)
-                  Response.message='Success creating data of another codelab student';
-                  Response.data=Student
-                  Response.success=true
-                  res.write(JSON.stringify({Status,Response}))
-                  res.end()
-         }
-})
-})
-         
+});
 Server.listen(Port,()=>{
          console.log('listening on port',Port)
 })
