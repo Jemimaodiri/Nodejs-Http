@@ -1,62 +1,65 @@
-import http, { IncomingMessage, ServerResponse } from 'http';
-const Port:number=3700;
+import http, { IncomingMessage, ServerResponse } from 'http'
+const port:number=1322;
+
 interface iMessage{
          message:string;
-         data:null|any| {}|{}[]
-         success:boolean
+         sucess:boolean;
+         data:null| {}| {}[]
 }
-interface iData{
-         name:string
-         school:string
-         gender:string
+interface iDetail{
+         name:string;
+         prepost:string
+         experience:string
 }
-let Id:iData[]=[
+const detail:iDetail[]=[
          {
-                  name:'Amen',
-                  school:'AmenIntlsch',
-                  gender:'male'
+                  name:'Exper',
+                  prepost:'gateman',
+                  experience:'5years'
          },
          {
-                  name:'Glory',
-                  school:'GloryIntlsch',
-                  gender:'female'
+                  name:'Exper',
+                  prepost:'gateman',
+                  experience:'5years'
          }
 ]
 const Server=http.createServer((req:IncomingMessage,res:ServerResponse<IncomingMessage>)=>{
-         res.setHeader('Content-Type', 'application/json');
+         res.setHeader('Content-Type', 'application/json')
          const {method,url}=req
+         let Status:number=404;
+         let Response:iMessage={
+                  message:'Failed',
+                  sucess:false,
+                  data:null,
+         }
          const Contain:any=[]
-         res.on('data',(chunk:any)=>{
+         req.on('data',(chunk:any)=>{
                   Contain.push(chunk)
          }).on('end',()=>{
-                  let Status:number=404;
-                  let Return:iMessage={
-                           message:'Failed',
-                           success:true,
-                           data:Id
-                  }
                 
                   if (url==='/' && method==='GET') {
                            Status=200;
-                           Return.message='Success',
-                           Return.success=true,
-                           Return.data=Id
-                           res.write(JSON.stringify({Status,Return}));
-                           res.end();
+                           Response.message='Gotten';
+                           Response.sucess=true;
+                           Response.data=detail;
+
+                           res.write(JSON.stringify({Status,Response}))
+                           res.end()
                   }
+                
                   if (url==='/' && method==='POST') {
                            Status=201;
                            const body=JSON.parse(Contain)
-                           Id.push(body)
-                           Return.message='Created',
-                           Return.success=true,
-                           Return.data=Id
-                           res.write(JSON.stringify({Status,Return}));
-                           res.end();
+                           detail.push(body);
+                           Response.message='created successfully';
+                           Response.sucess=true;
+                           Response.data=detail;
+                           res.write(JSON.stringify({Status,Response}))
+                           res.end()
                   }
-         })
 
-});
-Server.listen(Port,()=>{
-         console.log('listening on port',Port)
+         })
+}) 
+Server.listen(port,()=>{
+         console.log('Server listening on port',port)
 })
